@@ -34,7 +34,7 @@ if (process.env.NODE_ENV === 'production') {
 
 const authRoutes = require('./api/auth/auth.routes')
 const userRoutes = require('./api/user/user.routes')
-const reviewRoutes = require('./api/review/review.routes')
+const ordersRoutes = require('./api/orders/orders.routes')
 const projRoutes = require('./api/proj/proj.route')
 const {connectSockets} = require('./services/socket.service')
 
@@ -44,7 +44,7 @@ app.all('*', setupAsyncLocalStorage)
 
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
-app.use('/api/review', reviewRoutes)
+app.use('/api/orders', ordersRoutes)
 app.use('/api/proj' , projRoutes)
 connectSockets(http, session)
 

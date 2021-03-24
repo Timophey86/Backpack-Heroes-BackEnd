@@ -1,15 +1,23 @@
 const dbService = require("../../services/db.service");
 const ObjectId = require("mongodb").ObjectId;
-// const asyncLocalStorage = require('../../services/als.service')
+const asyncLocalStorage = require('../../services/als.service')
 
 async function query(filterBy) {
+  
   const criteria = _buildCriteria(filterBy);
-  // console.log(criteria)
+  console.log(filterBy);
+  
   try {
     const collection = await dbService.getCollection("projs"); //bring the collection
-    var projs = await collection.find(criteria).toArray();
-    return projs;
-
+    var projs = await collection.find().toArray();
+    if (filterBy.userId) {
+      const projsToReturn = projs.filter((proj) => {
+        return proj.host._id === filterBy.userId;
+      });
+      return projsToReturn;
+    } else{ 
+      
+      return projs}
     // const regex = new RegExp(filterBy.name, 'i')
     // var projsForDisplay = gProj.filter(proj => {
     //       return regex.test(proj.name) && (proj.type === filterBy.type || filterBy.type === 'all')
@@ -22,7 +30,8 @@ async function query(filterBy) {
 
 async function getById(id) {
   try {
-    const collection = await dbService.getCollection("projs"); //bring the collection
+    const collection = await
+   dbService.getCollection("projs"); //bring the collection
     const proj = await collection.findOne({ _id: ObjectId(id) });
     return proj;
   } catch (err) {
@@ -34,7 +43,8 @@ async function getById(id) {
 async function remove(id, userId) {
   try {
     const proj = await getById(id);
-    if (proj.host._id !== userId) throw new Error(`Can't remove someone elses project`);
+    if (proj.host._id !== userId) {
+      throw new Error(`Can't remove someone elses project`)}
     const collection = await dbService.getCollection("projs"); //bring the collection
     const query = { _id: ObjectId(id) };
     await collection.deleteOne(query);
@@ -70,16 +80,16 @@ async function update(proj) {
 }
 
 function _buildCriteria(filterBy) {
-  const criteria = {};
+  var criteria = {};
   if (filterBy.name) {
     const txtCriteria = { $regex: filterBy.name, $options: "i" };
     criteria.name = txtCriteria;
   }
-  if (filterBy.type !== "all") {
+  if (filterBy.type && filterBy.type !== "all") {
     criteria.type = filterBy.type;
   }
-  if (filterBy.inStock === "true") {
-    criteria.inStock = true;
+  if (filterBy.userId) {
+    criteria = `{"host._id":"${filterBy.userId}"}`;
   }
   return criteria;
 }
