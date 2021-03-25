@@ -14,6 +14,7 @@ async function query(filterBy) {
       const projsToReturn = projs.filter((proj) => {
         return proj.host._id === filterBy.userId;
       });
+      console.log('this are projs to return ',projsToReturn.length);
       return projsToReturn;
     } else{ 
       

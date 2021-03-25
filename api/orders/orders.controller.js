@@ -41,6 +41,8 @@ async function updateOrder(req, res) {
     try {
       const order = req.body;
       const savedOrder = await orderService.update(order);
+    //   socketService.emit({type: 'order-update', data: order})
+    //   socketService.emitToUser('u101', {type: 'order-update', data: order})
       res.json(savedOrder);
     } catch (err) {
       res.status(500).send("cannot update order");
