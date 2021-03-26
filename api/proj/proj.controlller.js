@@ -1,6 +1,6 @@
 const logger = require("../../services/logger.service");
 const projService = require("./proj.service.js");
-const userService = require('../user/user.service')
+const userService = require("../user/user.service");
 
 async function getProjs(req, res) {
   try {
@@ -32,13 +32,13 @@ async function getProjById(req, res) {
 
 async function addProj(req, res) {
   try {
-    var currProj= req.body
+    var currProj = req.body;
     var currUser = {
       _id: req.session.user._id,
       fullname: req.session.user.fullname,
       imgUrl: req.session.user.imgUrl,
     };
-    currProj.host = currUser
+    currProj.host = currUser;
     const savedProj = await projService.add(currProj);
     // var miniProj = {
     //     _id:savedProj._id,
@@ -46,7 +46,7 @@ async function addProj(req, res) {
     //     startsAt: savedProj.startsAt,
     //     startsEnd: savedProj.startsEnd
     // }
-    
+
     // req.session.user.myProjs.push(miniProj)
     // await userService.update(req.session.user)
 
@@ -62,9 +62,15 @@ async function addProj(req, res) {
 async function updateProj(req, res) {
   try {
     const proj = req.body;
-    if (proj.host._id !== req.session.user._id) throw new Error(`Can't update someone elses project`);
-    const savedProj = await projService.update(proj);
-    res.json(savedProj);
+    const  projUpdated =  await projService.getById(req.body._id);
+    if (projUpdated.reviews.length < proj.reviews.length) {
+      const savedProj = await projService.update(proj);
+      res.json(savedProj);
+    } else {
+      if (proj.host._id !== req.session.user._id) throw new Error(`Can't update someone elses project`);
+      const savedProj = await projService.update(proj);
+      res.json(savedProj);
+    }
   } catch (err) {
     res.status(500).send("cannot update proj");
   }

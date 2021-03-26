@@ -1,24 +1,24 @@
 const dbService = require("../../services/db.service");
 const ObjectId = require("mongodb").ObjectId;
-const asyncLocalStorage = require('../../services/als.service')
+const asyncLocalStorage = require("../../services/als.service");
 
 async function query(filterBy) {
-  
+  // console.log(filterBy)
   const criteria = _buildCriteria(filterBy);
-  console.log(filterBy);
-  
+  console.log('criteria ',criteria);
+
   try {
     const collection = await dbService.getCollection("projs"); //bring the collection
-    var projs = await collection.find().toArray();
+    var projs = await collection.find(criteria).toArray();
     if (filterBy.userId) {
       const projsToReturn = projs.filter((proj) => {
         return proj.host._id === filterBy.userId;
       });
-      console.log('this are projs to return ',projsToReturn.length);
       return projsToReturn;
-    } else{ 
-      
-      return projs}
+    } else {
+      return projs;
+    }
+
     // const regex = new RegExp(filterBy.name, 'i')
     // var projsForDisplay = gProj.filter(proj => {
     //       return regex.test(proj.name) && (proj.type === filterBy.type || filterBy.type === 'all')
@@ -31,8 +31,7 @@ async function query(filterBy) {
 
 async function getById(id) {
   try {
-    const collection = await
-   dbService.getCollection("projs"); //bring the collection
+    const collection = await dbService.getCollection("projs"); //bring the collection
     const proj = await collection.findOne({ _id: ObjectId(id) });
     return proj;
   } catch (err) {
@@ -45,7 +44,8 @@ async function remove(id, userId) {
   try {
     const proj = await getById(id);
     if (proj.host._id !== userId) {
-      throw new Error(`Can't remove someone elses project`)}
+      throw new Error(`Can't remove someone elses project`);
+    }
     const collection = await dbService.getCollection("projs"); //bring the collection
     const query = { _id: ObjectId(id) };
     await collection.deleteOne(query);
@@ -82,15 +82,27 @@ async function update(proj) {
 
 function _buildCriteria(filterBy) {
   var criteria = {};
-  if (filterBy.name) {
-    const txtCriteria = { $regex: filterBy.name, $options: "i" };
-    criteria.name = txtCriteria;
+  // if (filterBy.name) {
+  //   const txtCriteria = { $regex: filterBy.name, $options: "i" };
+  //   criteria.name = txtCriteria;
+  // }
+  if (filterBy.category) {
+    criteria.tags = filterBy.category;
   }
-  if (filterBy.type && filterBy.type !== "all") {
-    criteria.type = filterBy.type;
+  if (filterBy.location) {
+    criteria["loc.country"] = filterBy.location;
+   
+  } 
+  // if (filterBy.from) {
+  //   criteria.startsAt = {}
+  //   criteria.startsAt.$gte= parseInt(filterBy.from)
+  // }
+  if (filterBy.to) {
+    criteria.endAt = {}
+    criteria.endAt.$lt = parseInt(filterBy.to)
   }
   if (filterBy.userId) {
-    criteria = `{"host._id":"${filterBy.userId}"}`;
+    criteria = {}
   }
   return criteria;
 }
