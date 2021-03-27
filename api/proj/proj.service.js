@@ -18,11 +18,6 @@ async function query(filterBy) {
     } else {
       return projs;
     }
-
-    // const regex = new RegExp(filterBy.name, 'i')
-    // var projsForDisplay = gProj.filter(proj => {
-    //       return regex.test(proj.name) && (proj.type === filterBy.type || filterBy.type === 'all')
-    //             && (JSON.stringify(proj.inStock) === filterBy.inStock || filterBy.inStock === 'all')
   } catch (err) {
     logger.error("cannot find projs", err);
     throw err;
@@ -93,13 +88,13 @@ function _buildCriteria(filterBy) {
     criteria["loc.country"] = filterBy.location;
    
   } 
-  // if (filterBy.from) {
-  //   criteria.startsAt = {}
-  //   criteria.startsAt.$gte= parseInt(filterBy.from)
-  // }
+  if (filterBy.from) {
+    criteria.startsAt = {}
+    criteria.startsAt.$lt = parseInt(filterBy.from)
+  }
   if (filterBy.to) {
     criteria.endAt = {}
-    criteria.endAt.$lt = parseInt(filterBy.to)
+    criteria.endAt.$gte= parseInt(filterBy.to)
   }
   if (filterBy.userId) {
     criteria = {}
