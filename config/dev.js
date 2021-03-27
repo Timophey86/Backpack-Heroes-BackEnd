@@ -1,3 +1,4 @@
 module.exports = {
-  'dbURL': 'mongodb://localhost:27017',
+  'dbURL': 'mongodb+srv://tima:1234@cluster0.rbszt.mongodb.net/Backpack-HeroesDB?retryWrites=true&w=majority',
+  // 'dbURL': 'mongodb://localhost:27017',
 }
