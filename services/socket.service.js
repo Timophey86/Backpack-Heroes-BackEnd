@@ -20,7 +20,6 @@ function connectSockets(http, session) {
         // TODO: emitToUser feature - need to tested for CaJan21
         // if (socket.handshake?.session?.user) socket.join(socket.handshake.session.user._id)
         socket.on('disconnect', socket => {
-            console.log('Someone disconnected')
             if (socket.handshake) {
                 gSocketBySessionIdMap[socket.handshake.sessionID] = null
             }
@@ -33,6 +32,7 @@ function connectSockets(http, session) {
             socket.join(topic)
             // logger.debug('Session ID is', socket.handshake.sessionID)
             socket.myTopic = topic
+            console.log('is thi ? ',socket.myTopic );
         })
         socket.on('chat newMsg', msg => {
             // emits to all sockets:
@@ -40,7 +40,16 @@ function connectSockets(http, session) {
             // emits only to sockets in the same room
             gIo.to(socket.myTopic).emit('chat addMsg', msg)
         })
-
+        socket.on('sayHi', msg => {
+            // emits to all sockets:
+            gIo.emit('chat addMsg', msg)
+            // emits only to sockets in the same room
+            console.log('hiiiii')
+        })
+        socket.on('joinRequest', request => {
+            // emits to all sockets:
+            gIo.emit('requestFromUser', request)
+        })
     })
 }
 
