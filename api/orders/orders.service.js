@@ -4,20 +4,18 @@ const asyncLocalStorage = require("../../services/als.service");
 
 async function query(filterBy = {}) {
   try {
-    // const criteria = _buildCriteria(filterBy)
+    const criteria = _buildCriteria(filterBy);
     const collection = await dbService.getCollection("orders"); //bring to DB
-    // const orders = await collection.find(criteria).toArray()
-    var orders = await collection.find().toArray();
-    const ordersToReturn = { host: [], reserved: [] };
-
-    orders.forEach((order) => {
+    const orders = await collection.find(criteria).toArray();
+    const ordersToReturn = orders.reduce((acc, order) => {
       if (order.host._id === filterBy.userId) {
-        ordersToReturn.host.push(order);
+        acc["host"] = [...(acc["host"] || []), order];
       }
       if (order.member._id === filterBy.userId) {
-        ordersToReturn.reserved.push(order);
+        acc["reserved"] = [...(acc["reserved"] || []), order];
       }
-    });
+      return acc;
+    }, {});
 
     return ordersToReturn;
   } catch (err) {
@@ -67,6 +65,12 @@ async function update(order) {
 
 function _buildCriteria(filterBy) {
   const criteria = {};
+  if (filterBy.userId) {
+    criteria.$or = [
+      { "host._id": filterBy.userId },
+      { "member._id": filterBy.userId },
+    ];
+  }
   return criteria;
 }
 

@@ -3,21 +3,12 @@ const ObjectId = require("mongodb").ObjectId;
 const asyncLocalStorage = require("../../services/als.service");
 
 async function query(filterBy) {
-  // console.log(filterBy)
   const criteria = _buildCriteria(filterBy);
-  console.log('criteria ',criteria);
-
   try {
     const collection = await dbService.getCollection("projs"); //bring the collection
     var projs = await collection.find(criteria).toArray();
-    if (filterBy.userId) {
-      const projsToReturn = projs.filter((proj) => {
-        return proj.host._id === filterBy.userId;
-      });
-      return projsToReturn;
-    } else {
-      return projs;
-    }
+
+    return projs;
   } catch (err) {
     logger.error("cannot find projs", err);
     throw err;
@@ -77,27 +68,22 @@ async function update(proj) {
 
 function _buildCriteria(filterBy) {
   var criteria = {};
-  // if (filterBy.name) {
-  //   const txtCriteria = { $regex: filterBy.name, $options: "i" };
-  //   criteria.name = txtCriteria;
-  // }
   if (filterBy.category) {
     criteria.tags = filterBy.category;
   }
   if (filterBy.location) {
     criteria["loc.country"] = filterBy.location;
-   
-  } 
-  if (filterBy.from) {
-    criteria.startsAt = {}
-    criteria.startsAt.$lt = parseInt(filterBy.from)
-  }
-  if (filterBy.to) {
-    criteria.endAt = {}
-    criteria.endAt.$gte= parseInt(filterBy.to)
   }
   if (filterBy.userId) {
-    criteria = {}
+    criteria["host._id"] = filterBy.userId;
+  }
+  if (filterBy.from) {
+    criteria.startsAt = {};
+    criteria.startsAt.$lt = parseInt(filterBy.from);
+  }
+  if (filterBy.to) {
+    criteria.endAt = {};
+    criteria.endAt.$gte = parseInt(filterBy.to);
   }
   return criteria;
 }

@@ -40,14 +40,8 @@ function connectSockets(http, session) {
             // emits only to sockets in the same room
             gIo.to(socket.myTopic).emit('chat addMsg', msg)
         })
-        socket.on('sayHi', msg => {
-            // emits to all sockets:
-            gIo.emit('chat addMsg', msg)
-            // emits only to sockets in the same room
-            console.log('hiiiii')
-        })
         socket.on('joinRequest', request => {
-            // emits to all sockets:
+            // emits to all sockets:s
             gIo.emit('requestFromUser', request)
         })
     })

@@ -25,7 +25,6 @@ async function deleteOrder(req, res) {
 
 async function addOrder(req, res) {
     try {
-        console.log('is this working ', req.body)
         order = await orderService.add(req.body)
         res.send(order)
 
